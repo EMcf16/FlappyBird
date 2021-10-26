@@ -15,23 +15,20 @@ class Bird(pygame.sprite.Sprite):
         self.gravity = 0
 
     def draw(self):
-        screen.blit(self.image, self.rect)
+        rotated_bird = pygame.transform.rotozoom(self.image, -self.gravity * 3, 1)
+        screen.blit(rotated_bird, self.rect)
 
     def player_input(self):
         keys = pygame.key.get_pressed()
+        mouse_click = pygame.mouse.get_pressed()[0]
+        if mouse_click:
+            self.gravity = -6
         if keys[pygame.K_SPACE] and cooldown_tracker == 0:
             self.gravity = -6
 
     def apply_gravity(self):
-        self.gravity += 0.3
+        self.gravity += 0.25
         self.rect.y += self.gravity
-
-    def floor_collision(self):
-        if bird.rect.y >= 500:
-            bird.rect.y = 300
-            return False
-        else:
-            return True
 
     def update(self):
         self.apply_gravity()
@@ -81,6 +78,13 @@ def draw_floor():
     screen.blit(floor, (floor_x_pos + 795, 500))
 
 
+def sprite_collision():
+    if pygame.sprite.spritecollide(bird, pipe_group, False):
+        return False
+    else:
+        return True
+
+
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Flappy Bird")
@@ -111,6 +115,8 @@ while True:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 game_active = True
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            game_active = True
         if event.type == pipe_timer and game_active:
             rand_height = choice(pipe_height)
             pipe_group.add(TopPipe(rand_height), BottomPipe(rand_height))
@@ -127,9 +133,13 @@ while True:
         draw_floor()
         bird.draw()
         bird.update()
-        game_active = bird.floor_collision()
+        game_active = sprite_collision()  # Checking for pipe collision
+        if bird.rect.y >= 500:  # Checking for floor collision
+            bird.rect.y = 300
+            game_active = False
     else:
         screen.blit(start_message, (250, 80))
+        bird.rect.y = 300
         pipe_group.empty()
 
     pygame.display.update()
