@@ -7,12 +7,30 @@ class Bird(pygame.sprite.Sprite):
 
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load(
+        self.upflap = pygame.image.load(
+            "graphics/yellowbird-upflap.png"
+        ).convert_alpha()
+        self.upflap = pygame.transform.rotozoom(self.upflap, 0, 1.5)
+        self.midflap = pygame.image.load(
             "graphics/yellowbird-midflap.png"
         ).convert_alpha()
-        self.image = pygame.transform.rotozoom(self.image, 0, 1.5)
-        self.rect = self.image.get_rect(midbottom=(300, 300))
+        self.midflap = pygame.transform.rotozoom(self.midflap, 0, 1.5)
+        self.downflap = pygame.image.load(
+            "graphics/yellowbird-downflap.png"
+        ).convert_alpha()
+        self.downflap = pygame.transform.rotozoom(self.downflap, 0, 1.5)
+
         self.gravity = 0
+        self.bird_index = 0
+        self.bird_animation = [self.upflap, self.midflap, self.downflap]
+        self.image = self.bird_animation[self.bird_index]
+        self.rect = self.image.get_rect(midbottom=(300, 300))
+
+    def animation(self):
+        self.bird_index += 0.1
+        if self.bird_index >= len(self.bird_animation):
+            self.bird_index = 0
+        self.image = self.bird_animation[int(self.bird_index)]
 
     def draw(self):
         rotated_bird = pygame.transform.rotozoom(self.image, -self.gravity * 3, 1)
@@ -31,6 +49,7 @@ class Bird(pygame.sprite.Sprite):
         self.rect.y += self.gravity
 
     def update(self):
+        self.animation()
         self.apply_gravity()
         self.player_input()
 
@@ -43,7 +62,7 @@ class TopPipe(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midbottom=(1000, height))
 
     def move_pipes(self):
-        self.rect.x -= 4
+        self.rect.x -= 3
 
     def update(self):
         self.move_pipes()
@@ -62,7 +81,7 @@ class BottomPipe(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midtop=(1000, height + 180))
 
     def move_pipes(self):
-        self.rect.x -= 4
+        self.rect.x -= 3
 
     def update(self):
         self.move_pipes()
