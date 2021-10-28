@@ -145,7 +145,7 @@ def main():
 
     # Timer
     pipe_timer = pygame.USEREVENT + 1
-    pygame.time.set_timer(pipe_timer, 1500)
+    pygame.time.set_timer(pipe_timer, 1600)
 
     # Sounds
     point_sound = pygame.mixer.Sound("sounds/point.wav")
